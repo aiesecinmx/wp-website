@@ -1,4 +1,4 @@
-FROM wordpress:php7.4-apache
+FROM wordpress:5.4.1-php7.4-apache
 
 # Use the PORT environment variable in Apache configuration files.
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
