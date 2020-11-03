@@ -1,4 +1,4 @@
-FROM wordpress:5.5-php7.4-apache
+FROM wordpress:5-php7.4-apache
 
 # Install Wordpress plugins with Composer into a temporary folder
 RUN apt-get update && apt-get install -y unzip
