@@ -14,37 +14,50 @@
  * @package WordPress
  */
 
-/** MySQL settings (via GCP's Secret Manager) */
-require_once __DIR__.'/vendor/autoload.php';
-use Google\Cloud\SecretManager\V1beta1\SecretManagerServiceClient;
+/** MySQL settings */
 
-$client = new SecretManagerServiceClient();
-$projectId = getenv('GCP_PROJECT_ID');
-$versionName = $client->secretVersionName($projectId, 'WP_DB_CREDENTIALS', 'latest');
-$response = $client->accessSecretVersion($versionName);
+$is_local = getenv('WP_ENV') === 'local';
+$is_prod = getenv('WP_ENV') === 'production';
 
-$dbSetup = json_decode($response->getPayload()->getData());
-define('DB_HOST', $dbSetup->DB_HOST);
-define('DB_NAME', $dbSetup->DB_NAME);
-define('DB_USER', $dbSetup->DB_USER);
-define('DB_PASSWORD', $dbSetup->DB_PASSWORD);
+if ($is_prod) {
+	/** Retrieve from GCP's Secret Manager */
+	require_once __DIR__.'/vendor/autoload.php';
+
+	$client = new Google\Cloud\SecretManager\V1beta1\SecretManagerServiceClient();
+	$projectId = getenv('GCP_PROJECT_ID');
+	$versionName = $client->secretVersionName($projectId, 'WP_DB_CREDENTIALS', 'latest');
+	$response = $client->accessSecretVersion($versionName);
+	
+	$dbSetup = json_decode($response->getPayload()->getData());
+	define('DB_HOST', $dbSetup->DB_HOST);
+	define('DB_NAME', $dbSetup->DB_NAME);
+	define('DB_USER', $dbSetup->DB_USER);
+	define('DB_PASSWORD', $dbSetup->DB_PASSWORD);
+} else {
+	define('WP_HOME', "http://127.0.0.1:".getenv('PORT'));
+	define('WP_SITEURL', "http://127.0.0.1:".getenv('PORT'));
+	define('DB_HOST', getenv('WP_DB_HOST'));
+	define('DB_NAME', getenv('WP_DB_NAME'));
+	define('DB_USER', getenv('WP_DB_USER'));
+	define('DB_PASSWORD', getenv('WP_DB_PASSWORD'));
+}
 
 /** Database Charset to use in creating database tables. */
 define('DB_CHARSET', 'utf8');
-/** The Database Collate type. Don't change this if in doubt. */
-define('DB_COLLATE', '');
 
 /**
  * Reverse proxy configuration
  * 
  * @see https://wordpress.org/support/article/administration-over-ssl/#using-a-reverse-proxy
  */
-define('FORCE_SSL_ADMIN', true);
-// in some setups HTTP_X_FORWARDED_PROTO might contain 
-// a comma-separated list e.g. http,https
-// so check for https existence
-if (strpos($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false)
-$_SERVER['HTTPS']='on';
+if(!$is_local) {
+	define('FORCE_SSL_ADMIN', true);
+	// in some setups HTTP_X_FORWARDED_PROTO might contain 
+	// a comma-separated list e.g. http,https
+	// so check for https existence
+	if (strpos($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false)
+	$_SERVER['HTTPS']='on';
+}
 
 /**
  * Authentication Unique Keys and Salts.
@@ -71,7 +84,7 @@ define('NONCE_SALT',       'k,lU|_O+7$!=X6X%U>z-z%lz5i^a.cKwp%|jVA;[_d~pO[i(;mIW
  * You can have multiple installations in one database if you give each a unique
  * prefix. Only numbers, letters, and underscores please!
  */
-$table_prefix  = 'test_';
+$table_prefix = 'aiesec_';
 
 /**
  * For developers: WordPress debugging mode.
@@ -81,7 +94,7 @@ $table_prefix  = 'test_';
  * in their development environments.
  */
 /** Debugging enabled for non-production environments */
-define('WP_DEBUG', getenv('WP_ENV') !== 'PROD');
+define('WP_DEBUG', !$is_prod);
 define('WP_DEBUG_LOG', '/dev/stdout');
 
 /* That's all, stop editing! Happy blogging. */

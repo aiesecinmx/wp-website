@@ -1,6 +1,6 @@
 {
-    "name": "aiesecmx/wp-aiesec-test",
-    "description": "",
+    "name": "aiesecmx/wp-website",
+    "description": "AIESEC in Mexico's main website",
     "type": "project",
     "authors": [
         {
@@ -12,23 +12,13 @@
         {
             "type":"composer",
             "url":"https://wpackagist.org"
-        },
-        {
-            "type": "composer",
-            "url": "https://wp-languages.github.io"
         }
     ],
     "require": {
         "google/cloud-secret-manager": "^0.1.0",
-        "koodimonni-language/es_mx": "*",
-        "wpackagist-plugin/gcs":"0.1.5",
-        "wpackagist-plugin/akismet":"4.1.4"
-    },
-    "extra": {
-        "dropin-paths": {
-            "wp-content/languages/": ["vendor:koodimonni-language"],
-            "wp-content/languages/plugins/": ["vendor:koodimonni-plugin-language"],
-            "wp-content/languages/themes/": ["vendor:koodimonni-theme-language"]
-        }
+        "wpackagist-plugin/gcs":"0.1.6",
+        "wpackagist-plugin/akismet":"4.1.7",
+        "wpackagist-plugin/elementor":"3.0.12",
+        "wpackagist-theme/astra":"2.6.0"
     }
 }
