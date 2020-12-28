@@ -22,6 +22,7 @@ services:
     environment:
       PORT: 8080
       WP_ENV: local
+      WP_DEBUG: true
       WORDPRESS_DB_HOST: mysql:3306
       WORDPRESS_DB_NAME: aiesecmx_web
       WORDPRESS_DB_USER: wp_user
