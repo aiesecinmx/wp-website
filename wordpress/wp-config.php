@@ -16,7 +16,6 @@
 
 /** MySQL settings */
 
-$is_local = getenv('WP_ENV') === 'local';
 $is_prod = getenv('WP_ENV') === 'production';
 
 if ($is_prod) {
@@ -25,14 +24,14 @@ if ($is_prod) {
 
 	$client = new Google\Cloud\SecretManager\V1beta1\SecretManagerServiceClient();
 	$projectId = getenv('GCP_PROJECT_ID');
-	$versionName = $client->secretVersionName($projectId, 'WP_DB_CREDENTIALS', 'latest');
+	$versionName = $client->secretVersionName($projectId, 'prod-wp-website', 'latest');
 	$response = $client->accessSecretVersion($versionName);
 	
 	$dbSetup = json_decode($response->getPayload()->getData());
-	define('DB_HOST', $dbSetup->DB_HOST);
-	define('DB_NAME', $dbSetup->DB_NAME);
-	define('DB_USER', $dbSetup->DB_USER);
-	define('DB_PASSWORD', $dbSetup->DB_PASSWORD);
+	define('DB_HOST', $dbSetup->dbHost);
+	define('DB_NAME', $dbSetup->dbName);
+	define('DB_USER', $dbSetup->dbUser);
+	define('DB_PASSWORD', $dbSetup->dbPassword);
 } else {
 	define('WP_HOME', "http://127.0.0.1:".getenv('PORT'));
 	define('WP_SITEURL', "http://127.0.0.1:".getenv('PORT'));
@@ -50,7 +49,7 @@ define('DB_CHARSET', 'utf8');
  * 
  * @see https://wordpress.org/support/article/administration-over-ssl/#using-a-reverse-proxy
  */
-if(!$is_local) {
+if($is_prod) {
 	define('FORCE_SSL_ADMIN', true);
 	// in some setups HTTP_X_FORWARDED_PROTO might contain 
 	// a comma-separated list e.g. http,https
@@ -68,15 +67,15 @@ if(!$is_local) {
  *
  * @since 2.6.0
  */
-/** Last changed in March 2020 - by sergio.garcia */
-define('AUTH_KEY',         '-ACo7y%v5ta4=G5#kIOSV;7Z+v&ub!EddXq.jWf;Ib|.,3:^L<8jh,I|G;Oz)k)6');
-define('SECURE_AUTH_KEY',  'DumXU/-d g(I tI-rL-0Q@>c-{Z|E+FqxC /5Dg/|,#bZ{4lu}v-{]Hjl3e% DBZ');
-define('LOGGED_IN_KEY',    '-Y|>qsv0CVsn}):_)%w-%w/EAtM+N8L>EoG8lrBJ|%u-x8l~d6i|+QMf#6eBr:@A');
-define('NONCE_KEY',        'c%<[-~S=wk7AAiqS(Fb<6.nn-5%i;U `-?+b+J}c:n#F=]2Z;^FE1Y6J598lDF0=');
-define('AUTH_SALT',        'T-sc9vox(?O=MZ`&l&&{vlx(y{mMO4A*ce%8@b.%;2@ePkEdpf|NH5 bu]eM}1){');
-define('SECURE_AUTH_SALT', 'DnqwFU:L-/[<pn.PFT?!_U(|_WiysP_Y-Mjqc+pPl7G(hDi!V[+}mb[N5b;YY{-^');
-define('LOGGED_IN_SALT',   '8{E:cg_G2e.S2)GL?mY;j7x+q#?`iE^tSU%whp:,Xpy<xc8t_dLx9x-1B Dx$m$V');
-define('NONCE_SALT',       'k,lU|_O+7$!=X6X%U>z-z%lz5i^a.cKwp%|jVA;[_d~pO[i(;mIWCv+(bA Jh+PG');
+/** Last changed in November 2020 - by sergio.garcia */
+define('AUTH_KEY',         'z qO4Zfk ojhn*3ze+8Y/i~xD@6RGj[6<k|P}C+qx|I|;0dgB??%Xe5};~JH-S]b');
+define('SECURE_AUTH_KEY',  'vu]h$c@Ra{JLZ1e!,x-7KP^qk+HPhO=J42Ft30R,?q Den<D7b.ZR]MNm]e*&go^');
+define('LOGGED_IN_KEY',    'nADC2{W_Ei#yF.MMWP(~Nv=iBYKX9nE6!aWH{mQYB=yc*b}]:x2A6s|xEZY]V+8w');
+define('NONCE_KEY',        '2i737-:Nw~~K[u81)UDs%><249;Mj(<(|dDEyeM;(}N_nbG8Rex{;km1Ax<g)H|P');
+define('AUTH_SALT',        '/vhfv;eQN~FX}u=B13~8^-Z$_1DpibbW#j&!Lglw*b;dsjCAU+H[72O-2FSdDOtt');
+define('SECURE_AUTH_SALT', 'i~W,w-)/96/-cbmkS|-;<m$M}s)O|nWHT=?2sZ#Swm;Z7}8283J|v0=$6]F%]F&`');
+define('LOGGED_IN_SALT',   'eVNGW8NtF!dY@!Mo@-KdNC}|+jd=8A-n>=cg}?YLjP(4.A+x}1V&Z,&~|jRyDN+P');
+define('NONCE_SALT',       'h8HT#OSL[qdC$}=}Jb=FxeoMN25{[WttGa(871r5PT23|Y]{i>Z!h9w_e}M{>}+c');
 
 /**
  * WordPress Database Table prefix.
@@ -94,7 +93,7 @@ $table_prefix = 'aiesec_';
  * in their development environments.
  */
 /** Debugging enabled for non-production environments */
-define('WP_DEBUG', !$is_prod);
+define('WP_DEBUG', getenv('WP_DEBUG') === 'true');
 define('WP_DEBUG_LOG', '/dev/stdout');
 
 /* That's all, stop editing! Happy blogging. */
