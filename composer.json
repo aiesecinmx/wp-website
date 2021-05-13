@@ -17,8 +17,10 @@
     "require": {
         "google/cloud-secret-manager": "^0.1.0",
         "wpackagist-plugin/gcs":"0.1.6",
-        "wpackagist-plugin/akismet":"^4.1.7",
-        "wpackagist-plugin/elementor":"^3.0.14",
-        "wpackagist-theme/astra":"^2.6.0"
+        "wpackagist-theme/astra":"^3.0.2",
+        "wpackagist-plugin/elementor":"^3.1.0",
+        "wpackagist-plugin/astra-hooks":"1.0.2",
+        "wpackagist-plugin/wordpress-seo":"^16.0.2",
+        "wpackagist-plugin/redirection":"^5.0.1"
     }
 }
