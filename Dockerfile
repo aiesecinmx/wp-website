@@ -1,28 +1,31 @@
 FROM wordpress:5-php7.4-apache
 
-# Set up base image
+# Set up Apache port
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
+## Delete all pre-installed plugins
 RUN cd /usr/src/wordpress/wp-content && rm -rfv plugins themes
+
+# Install composer dependencies
 RUN apt-get update && apt-get install -y unzip
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
-# Install composer dependencies
+### Wordpress Customization ###
 WORKDIR /tmp
 COPY composer.* ./
 RUN composer install
-
-# Move vendor dependencies into Wordpress' source folder
 RUN mv vendor /usr/src/wordpress
 
-### Wordpress Customization ###
+COPY wordpress/wp-content/plugins wp-content/plugins/
+COPY wordpress/wp-content/themes wp-content/themes/
+RUN cp -R wp-content /usr/src/wordpress
+RUN ls wp-content/themes/ && ls wp-content/plugins/
 
-# Copy custom plugins into the tmp folder
-COPY wordpress/wp-content/plugins/ wp-content/plugins/
+# Copy custom packages to src code
+#COPY packages /usr/src/wordpress
+#RUN cd /usr/src/wordpress/donation && composer install
+#COPY payment_config.php /usr/config/
 
-# Replace wp-contents into Wordpress' source
-RUN cp -R --parents wp-content/* /usr/src/wordpress/
-
-# Needed for Wordpress' entrypoint
+# Required for the base image's entrypoint
 WORKDIR /var/www/html
 
 # Copy custom configuration file into the public html folder
