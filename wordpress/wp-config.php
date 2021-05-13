@@ -96,6 +96,9 @@ $table_prefix = 'aiesec_';
 define('WP_DEBUG', getenv('WP_DEBUG') === 'true');
 define('WP_DEBUG_LOG', '/dev/stdout');
 
+/** Enable W3 Total Cache */
+define('WP_CACHE', true);
+
 /* That's all, stop editing! Happy blogging. */
 
 /** Absolute path to the WordPress directory. */
